@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Payment{% endblock %}
+{% block stylesheet %}{% static 'payment/css/verification/pin.css' %}{% endblock stylesheet %}
+{% block content %}
+
+<h1>Enter PIN</h1>
+<div class="pin-code">
+	<form action="." method="post">
+		{% csrf_token %}
+	  <input type="number" name="first" maxlength="1" autofocus>
+    <input type="number" name="second" maxlength="1">
+	  <input type="number" name="third" maxlength="1">
+    <input type="number" name="fourth" maxlength="1">
+	<input type="hidden" name="step" value="pincheck">
+	<input type="submit" value="Continue" class="nbtn">
+	</form>
+ </div>
+
+<script>
+	var pinContainer = document.querySelector(".pin-code");
+	
+	pinContainer.addEventListener('keyup', function (event) {
+		var target = event.srcElement;
+		
+		var maxLength = parseInt(target.attributes["maxlength"].value, 10);
+		var myLength = target.value.length;
+	
+		if (myLength >= maxLength) {
+			var next = target;
+			while (next = next.nextElementSibling) {
+				if (next == null) break;
+				if (next.tagName.toLowerCase() == "input") {
+					next.focus();
+					break;
+				}
+			}
+		}
+	
+		if (myLength === 0) {
+			var next = target;
+			while (next = next.previousElementSibling) {
+				if (next == null) break;
+				if (next.tagName.toLowerCase() == "input") {
+					next.focus();
+					break;
+				}
+			}
+		}
+	}, false);
+	
+	pinContainer.addEventListener('keydown', function (event) {
+		var target = event.srcElement;
+		target.value = "";
+	}, false);
+</script>
+{% endblock %}

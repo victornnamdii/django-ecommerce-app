@@ -1,0 +1,118 @@
+{% extends "../base.html" %}
+{% load static %}
+{% block title %}Payment{% endblock %}
+{% block stylesheet %}{% static 'payment/css/payment.css' %}{% endblock stylesheet %}{% static '' %}
+{% block content %}
+
+<div class="nrow">
+	<div class="ncol-75">
+	  <div class="ncontainer">
+		<form action="{% url "payment:basket" %}" method="post">
+			{% csrf_token %}
+  
+		  <div class="nrow">
+			{% if form.errors %}
+            <p>Please correct the following errors:</p>
+            {% for field in form %}
+            {% if field.errors %}
+            <div class="alert alert-primary" role="alert">
+            {{ field.label }}: {{ field.errors|striptags }}
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+			{% if errMsg %}
+			<div class="alert alert-primary" role="alert">There was a problem processing your payment. Check your details and try again.</div>
+			{% endif %}
+			<div class="ncol-50">
+			  <h3>Shipping Address</h3>
+			  <label><i class="fa fa-user"></i>{{ form.firstname.label }}</label>
+			  {{ form.firstname }}
+			  <label><i class="fa fa-user"></i>{{ form.lastname.label }}</label>
+			  {{ form.lastname }}
+			  <label>{{ form.email.label }}</label>
+			  {{ form.email }}
+			  <label><i class="fa fa-user"></i>{{ form.address1.label }}</label>
+			  {{ form.address1 }}
+			  <label><i class="fa fa-user"></i>{{ form.address2.label }}</label>
+			  {{ form.address2 }}
+			  <label><i class="fa fa-user"></i>{{ form.city.label }}</label>
+			  {{ form.city }}
+			  <label><i class="fa fa-user"></i>{{ form.state.label }}</label>
+			  {{ form.state }}
+			  <div class="nrow">
+				<div class="ncol-50">
+					<label><i class="fa fa-user"></i>{{ form.zipcode.label }}</label>
+					{{ form.zipcode }}
+				</div>
+				<div class="ncol-50">
+					<label><i class="fa fa-user"></i>{{ form.phone_number.label }}</label>
+					{{ form.phone_number }}
+				</div>
+			  </div>
+			</div>
+  
+			<div class="ncol-50">
+			  <h3>Payment</h3>
+			  <label for="fname">Accepted Cards</label>
+			  <div class="icon-ncontainer">
+				<i class="fa fa-cc-visa" style="color:navy;"></i>
+				<i class="fa fa-cc-amex" style="color:blue;"></i>
+				<i class="fa fa-cc-mastercard" style="color:red;"></i>
+				<i class="fa fa-cc-discover" style="color:orange;"></i>
+			  </div>
+			  <label><i class="fa fa-user"></i>{{ form.name_on_card.label }}</label>
+			  {{ form.name_on_card }}
+			  <label><i class="fa fa-user"></i>{{ form.cardno.label }}</label>
+			  {{ form.cardno }}
+			  <label><i class="fa fa-user"></i>{{ form.expirymonth.label }}</label>
+			  {{ form.expirymonth }}
+  
+			  <div class="nrow">
+				<div class="ncol-50">
+					<label><i class="fa fa-user"></i>{{ form.expiryyear.label }}</label>
+					{{ form.expiryyear }}
+				</div>
+				<div class="ncol-50">
+					<label><i class="fa fa-user"></i>{{ form.cvv.label }}</label>
+					{{ form.cvv }}
+				</div>
+			  </div>
+			</div>
+  
+		  </div>
+		  <label>
+			<input type="checkbox" checked="checked" name="sameadr"> Shipping address same as billing
+		  </label>
+		  <input type="hidden" name="step" value="cardcheck">
+		  <input id="checkout-button" type="submit" value="Continue to checkout" class="nbtn">
+		</form>
+	  </div>
+	</div>
+  
+	<div class="ncol-25">
+	  <div class="ncontainer">
+		<h4>Cart
+		  <span class="price" style="color:black">
+			<i class="fa fa-shopping-cart"></i>
+			<b>{{basket|length}}</b>
+		  </span>
+		</h4>
+		{% for item in product_list2 %}
+		{% with product=item.0 %}
+		<p><a href="{{product.get_absolute_url}}">{{product.title}}</a> <span class="price">${{product.price}}</span></p>
+		{% endwith %}
+		{% endfor %}
+		<hr>
+		<p>Total <span class="price" style="color:black"><b>${{basket.get_subtotal_price}}</b></span></p>
+	  </div>
+	</div>
+  </div>
+
+  <script>
+    {% comment %} Make csrf token availble in JS files {% endcomment %}
+    var CSRF_TOKEN = '{{ csrf_token }}';
+</script>
+
+{% endblock %}
+  

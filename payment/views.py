@@ -1,0 +1,139 @@
+from rave_python import Rave, RaveExceptions, Misc
+from rave_python.rave_misc import generateTransactionReference
+from accounts.models import UserBase
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+
+from basket.basket import Basket
+from .forms import PaymentForm
+from .decorators import cart_required
+from orders.views import order_add
+from basket.context_processors import product_list2
+from orders.models import Order
+
+
+# Create your views here.
+
+rave = Rave('FLWPUBK_TEST-0d9fe5eb2511f825e72fef201efb1d83-X',
+            'FLWSECK_TEST-67790c74a09a04c2096d86747558036e-X',
+            usingEnv=False)
+
+
+@login_required
+@cart_required
+def BasketView(request):
+    basket = Basket(request)
+
+    user = UserBase.objects.get(user_name=request.user)
+
+    if request.method != 'POST':
+        form = PaymentForm()
+        return render(request, 'payment/payment_form.html',
+                      {'form': form})
+
+    if request.method == 'POST':
+        if request.POST.get('step') == 'cardcheck':
+            form = PaymentForm(request.POST)
+            if form.is_valid():
+                txRef = generateTransactionReference('LC' + str(user.id))
+                payload = {
+                    'cardno': form.cleaned_data['cardno'],
+                    'cvv': form.cleaned_data['cvv'],
+                    'currency': 'NGN',
+                    'country': 'NG',
+                    'expirymonth': form.cleaned_data['expirymonth'],
+                    'expiryyear': form.cleaned_data['expiryyear'],
+                    'amount': basket.get_total_price(),
+                    'email': form.cleaned_data['email'],
+                    'phonenumber': form.cleaned_data['phone_number'],
+                    'txRef': txRef,
+                    'enckey': 'FLWSECK_TESTd6760438b729',
+                    'userid': str(user.id)
+                }
+                order_details = {
+                    'full_name': form.cleaned_data['firstname'] + ' ' +
+                    form.cleaned_data['lastname'],
+                    'address1': form.cleaned_data['address1'],
+                    'address2': form.cleaned_data['address2'],
+                    'city': form.cleaned_data['city'],
+                    'phone': form.cleaned_data['phone_number'],
+                    'post_code': form.cleaned_data['zipcode'],
+                    'order_key': txRef,
+                    'userid': str(user.id),
+                    'cardno': str(form.cleaned_data['cardno'])[-4:],
+                    'amount': basket.get_total_price(),
+                }
+                order_items = []
+                for item in product_list2(request)['product_list2']:
+                    item_dict = {}
+                    item_dict['product'] = item[0]
+                    item_dict['price'] = item[0].price
+                    item_dict['qty'] = item[1]
+                    order_items.append(item_dict)
+
+                order_add(order_details, order_items)
+                request.session['payload'] = payload
+        try:
+            payload = request.session['payload']
+            res = rave.Card.charge(payload)
+
+            if res["suggestedAuth"]:
+                arg = Misc.getTypeOfArgsRequired(res["suggestedAuth"])
+
+                if arg == 'pin':
+                    if request.POST.get('step') != 'pincheck':
+                        return render(request, 'payment/verification/pin.html')
+                    elif request.POST.get('step') == 'pincheck':
+                        pin = str(request.POST.get('first'))
+                        pin += str(request.POST.get('second'))
+                        pin += str(request.POST.get('third'))
+                        pin += str(request.POST.get('fourth'))
+                        Misc.updatePayload(res["suggestedAuth"],
+                                           payload, pin=pin)
+                        res = rave.Card.charge(payload)
+                        request.session['payload'] = payload
+
+            if res["validationRequired"]:
+                if request.POST.get('step') != 'otpcheck':
+                    return render(request, 'payment/verification/otp.html')
+                if request.POST.get('step') == 'otpcheck':
+                    otp = str(request.POST.get('first'))
+                    otp += str(request.POST.get('second'))
+                    otp += str(request.POST.get('third'))
+                    otp += str(request.POST.get('fourth'))
+                    otp += str(request.POST.get('fifth'))
+                    rave.Card.validate(res["flwRef"], otp)
+
+            res = rave.Card.verify(res["txRef"])
+            if res['transactionComplete']:
+                Order.objects.filter(order_key=payload['txRef']).update(
+                    billing_status=True)
+                del request.session['payload']
+                for item in product_list2(request)['product_list2']:
+                    product = item[0]
+                    product.count = product.count - item[1]
+                    product.save()
+                basket.clear()
+                return render(request, 'payment/orderplaced.html')
+            else:
+                del request.session['payload']
+                return render(request, 'payment/payment_form.html',
+                              {'form': form, 'errMsg': True})
+
+        except (RaveExceptions.CardChargeError,
+                RaveExceptions.TransactionVerificationError,
+                RaveExceptions.TransactionValidationError) as e:
+            del request.session['payload']
+            form = PaymentForm()
+            return render(request, 'payment/payment_form.html',
+                          {'form': form, 'errMsg': True})
+
+
+# def orderplaced(request):
+#    basket = Basket(request)
+#    for item in product_list2(request)['product_list2']:
+#        product = item[0]
+#        product.count = product.count - item[1]
+#        product.save()
+#    basket.clear()
+#    return render(request, 'payment/orderplaced.html')
