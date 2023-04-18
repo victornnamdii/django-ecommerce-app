@@ -1,11 +1,13 @@
-from store.models import Product
 from django.conf import settings
 
+from store.models import Product
 
-class Basket():
+
+class Basket:
     """
     Base basket class
     """
+
     def __init__(self, request):
         self.session = request.session
         self.basket = self.session.get(settings.BASKET_SESSION_ID, False)
@@ -14,7 +16,7 @@ class Basket():
         # self.session = request.session
         # basket = self.session.get('skey')
         # if 'skey' not in self.session:
-            # basket = self.session['skey'] = {}
+        # basket = self.session['skey'] = {}
         # self.basket = basket
 
     def add(self, product, product_qty):
@@ -24,10 +26,12 @@ class Basket():
         product_id = str(product.id)
 
         if product_id not in self.basket.keys():
-            self.basket[product_id] = {'price': float(product.price),
-                                       'qty': int(product_qty)}
+            self.basket[product_id] = {
+                "price": float(product.regular_price),
+                "qty": int(product_qty),
+            }
         else:
-            self.basket[product_id]['qty'] += int(product_qty)
+            self.basket[product_id]["qty"] += int(product_qty)
 
         self.save()
 
@@ -38,7 +42,7 @@ class Basket():
         product_id = str(product)
 
         if product_id in self.basket.keys():
-            self.basket[product_id]['qty'] = product_qty
+            self.basket[product_id]["qty"] = product_qty
 
         self.save()
 
@@ -50,28 +54,28 @@ class Basket():
         # for item in self.basket.values():
         #   count += item['qty']
         # return count
-        return sum(item['qty'] for item in self.basket.values())
+        return sum(item["qty"] for item in self.basket.values())
 
     def __iter__(self):
         """
         Making basket iterable (with all the product ids)
         """
         product_ids = self.basket.keys()
-        products = Product.products.filter(id__in=product_ids)
+        products = Product.objects.filter(id__in=product_ids)
         basket = self.basket.copy()
 
         for product in products:
-            basket[str(product.id)]['product'] = product
+            basket[str(product.id)]["product"] = product
 
         for item in basket.values():
-            item['total_price'] = item['price'] * item['qty']
+            item["total_price"] = item["price"] * item["qty"]
             yield item
 
     def get_subtotal_price(self):
         """
         Return basket total price
         """
-        return sum(item['qty'] * item['price'] for item in self.basket.values()
+        return sum(item["qty"] * item["price"] for item in self.basket.values()
                    )
 
     def get_total_price(self):

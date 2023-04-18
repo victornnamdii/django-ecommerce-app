@@ -30,6 +30,8 @@ def BasketView(request):
     user = UserBase.objects.get(user_name=request.user)
 
     if request.method != "POST":
+        if request.session.get("payload"):
+            del request.session["payload"]
         form = PaymentForm()
         return render(request, "payment/payment_form.html", {"form": form})
 
