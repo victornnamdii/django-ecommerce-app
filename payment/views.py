@@ -5,7 +5,7 @@ from django.shortcuts import redirect, render
 from rave_python import Misc, Rave, RaveExceptions
 from rave_python.rave_misc import generateTransactionReference
 
-from accounts.models import UserBase
+from accounts.models import Customer
 from basket.basket import Basket
 from basket.context_processors import product_list2
 from orders.models import Order
@@ -27,7 +27,7 @@ rave = Rave(publicKey, secretKey)
 def BasketView(request):
     basket = Basket(request)
 
-    user = UserBase.objects.get(user_name=request.user)
+    user = Customer.objects.get(name=request.user)
 
     if request.method != "POST":
         if request.session.get("payload"):
@@ -72,7 +72,7 @@ def BasketView(request):
                 for item in product_list2(request)["product_list2"]:
                     item_dict = {}
                     item_dict["product"] = item[0]
-                    item_dict["price"] = item[0].price
+                    item_dict["price"] = item[0].regular_price
                     item_dict["qty"] = item[1]
                     order_items.append(item_dict)
 

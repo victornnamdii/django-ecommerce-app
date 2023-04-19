@@ -143,7 +143,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 BASKET_SESSION_ID = "basket"
 
 # Create User Model
-AUTH_USER_MODEL = "accounts.UserBase"
+AUTH_USER_MODEL = "accounts.Customer"
 LOGIN_REDIRECT_URL = "/account/dashboard"
 LOGIN_URL = "/account/login/"
 
