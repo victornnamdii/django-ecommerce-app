@@ -27,7 +27,7 @@ class Basket:
 
         if product_id not in self.basket.keys():
             self.basket[product_id] = {
-                "price": float(product.regular_price),
+                "price": float(product.price),
                 "qty": int(product_qty),
             }
         else:

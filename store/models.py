@@ -128,6 +128,9 @@ class Product(models.Model):
             },
         },
     )
+    use_discount = models.BooleanField(_("Use discount price?"), default=False)
+    quantity = models.PositiveIntegerField(default=1)
+
     is_active = models.BooleanField(
         verbose_name=_("Product Visibility"),
         help_text=_("Change Product Visibility"),
@@ -141,9 +144,16 @@ class Product(models.Model):
         auto_now=True,
     )
     users_wishlist = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name="user_wishlist"
+        settings.AUTH_USER_MODEL, related_name="user_wishlist",
+        editable=False
     )
-    quantity = models.PositiveIntegerField(default=1)
+
+    price = models.DecimalField(
+        _("Active Price"),
+        max_digits=12,
+        decimal_places=2,
+        editable=False,
+    )
 
     class Meta:
         ordering = ("-created_at",)
@@ -158,6 +168,10 @@ class Product(models.Model):
 
     def save(self, *args, **kwargs):
         self.is_active = self.quantity > 0
+        if self.use_discount:
+            self.price = self.discount_price
+        else:
+            self.price = self.regular_price
         super().save()
 
 

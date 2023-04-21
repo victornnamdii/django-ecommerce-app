@@ -36,7 +36,11 @@
                     <a class="text-dark text-decoration-none"
                       href="{{ product.get_absolute_url }}">{{ product.title|slice:":50" }}</a>
                   </p>
-                  <div class="fw-bold">£{{product.regular_price}}</div>
+                  <div class="">
+                    {% if product.use_discount %}
+                    <span><del>£{{product.regular_price}}</del></span>
+                    {% endif %}
+                    <b>£{{product.price}}</b></div>
                 </div>
               </div>
             </div>

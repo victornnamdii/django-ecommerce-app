@@ -72,7 +72,7 @@ def BasketView(request):
                 for item in product_list2(request)["product_list2"]:
                     item_dict = {}
                     item_dict["product"] = item[0]
-                    item_dict["price"] = item[0].regular_price
+                    item_dict["price"] = item[0].price
                     item_dict["qty"] = item[1]
                     order_items.append(item_dict)
 

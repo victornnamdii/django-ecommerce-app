@@ -34,7 +34,12 @@
                     href="{{ product.get_absolute_url }}">{{ product.title }}</a>
                 </p>
                 <div class="d-flex justify-content-between align-items-center">
-                  <small class="text-muted">£{{product.regular_price}}</small>
+                  <small class="text-muted">
+                    {% if product.use_discount %}
+                    <span><del>£{{product.regular_price}}</del></span>
+                    {% endif %}
+                    <b>£{{product.price}}</b>
+                  </small>
                 </div>
               </div>
             </div>
