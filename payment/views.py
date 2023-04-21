@@ -118,7 +118,7 @@ def BasketView(request):
                 del request.session["payload"]
                 for item in product_list2(request)["product_list2"]:
                     product = item[0]
-                    product.count = product.count - item[1]
+                    product.quantity = product.quantity - item[1]
                     product.save()
                 basket.clear()
                 return render(request, "payment/orderplaced.html")
