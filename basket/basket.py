@@ -34,7 +34,7 @@ class Basket:
                 "qty": int(product_qty),
             }
         else:
-            self.basket[product_id]["qty"] += int(product_qty)
+            self.basket[product_id]["qty"] = int(product_qty)
 
         self.save()
 
