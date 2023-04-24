@@ -19,9 +19,11 @@ def product_detail(request, slug):
         wishlist = Product.objects.filter(users_wishlist=request.user)
     else:
         wishlist = []
+    quantity = range(1, product.quantity + 1)[:20]
     return render(
         request, "store/single.html", {"product": product,
-                                       "wishlist": wishlist}
+                                       "wishlist": wishlist,
+                                       "range": quantity}
     )
 
 

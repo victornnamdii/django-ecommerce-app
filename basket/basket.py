@@ -78,9 +78,9 @@ class Basket:
         """
         Return basket total price
         """
-        return sum(
+        return round(sum(
             item["qty"] * item["price"] for item in self.basket.values()
-        )
+        ), 2)
 
     def get_total_price(self):
         """

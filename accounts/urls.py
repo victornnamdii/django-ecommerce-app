@@ -103,4 +103,5 @@ urlpatterns = [
         views.wishlist,
         name="wishlist",
     ),
+    path("orders/", views.user_orders, name="user_orders"),
 ]

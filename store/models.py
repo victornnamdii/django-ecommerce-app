@@ -167,7 +167,10 @@ class Product(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        self.is_active = self.quantity > 0
+        if not self.is_active:
+            pass
+        else:
+            self.is_active = self.quantity > 0
         if self.use_discount:
             self.price = self.discount_price
         else:
