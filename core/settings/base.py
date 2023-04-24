@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "payment",
     "orders",
     "mptt",
+    "checkout",
 ]
 
 MIDDLEWARE = [
@@ -148,3 +149,5 @@ LOGIN_REDIRECT_URL = "/account/dashboard"
 LOGIN_URL = "/account/login/"
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"

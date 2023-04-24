@@ -71,7 +71,17 @@ urlpatterns = [
     ),
     path("addresses/", views.view_address, name="addresses"),
     path("add_address/", views.add_address, name="add_address"),
+    path(
+        "add_address_checkout/",
+        views.add_address_checkout,
+        name="add_address_checkout",
+    ),
     path("addresses/edit/<slug:id>/", views.edit_address, name="edit_address"),
+    path(
+        "addresses/edit_checkout/<slug:id>/",
+        views.edit_address_checkout,
+        name="edit_address_checkout",
+    ),
     path(
         "addresses/delete/<slug:id>/",
         views.delete_addresses,

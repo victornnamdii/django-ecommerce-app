@@ -1,43 +1,50 @@
 from os import getenv
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.shortcuts import HttpResponseRedirect, redirect, render
+from django.urls import reverse
 from rave_python import Misc, Rave, RaveExceptions
 from rave_python.rave_misc import generateTransactionReference
 
-from accounts.models import Customer
+from accounts.models import Address, Customer
 from basket.basket import Basket
 from basket.context_processors import product_list2
+from checkout.models import DeliveryOptions
 from orders.models import Order
 from orders.views import order_add
 
-from .decorators import cart_required
+from .decorators import cart_required, delivery_required
 from .forms import PaymentForm
 
 # Create your views here.
-publicKey = getenv("RAVE_PUBLIC_KEY", "")
-secretKey = getenv("RAVE_SECRET_KEY", "")
-encKey = getenv("RAVE_ENC_KEY", "")
+publicKey = getenv("RAVE_PUBLIC_KEY")
+secretKey = getenv("RAVE_SECRET_KEY")
+encKey = getenv("RAVE_ENC_KEY")
 
-rave = Rave(publicKey, secretKey)
+if secretKey:
+    rave = Rave(publicKey, secretKey)
+else:
+    rave = Rave(
+        "no_publicKey_available", "no_secretKey_available", usingEnv=False
+    )
 
 
-@login_required
+@delivery_required
 @cart_required
+@login_required
 def BasketView(request):
     basket = Basket(request)
 
     user = Customer.objects.get(name=request.user)
 
-    if request.method != "POST":
-        if request.session.get("payload"):
-            del request.session["payload"]
-        form = PaymentForm()
-        return render(request, "payment/payment_form.html", {"form": form})
-
     if request.method == "POST":
         if request.POST.get("step") == "cardcheck":
+            session = request.session
             form = PaymentForm(request.POST)
+            address = Address.objects.get(
+                customer=user.id, pk=session["address"]["address_id"]
+            )
             if form.is_valid():
                 txRef = generateTransactionReference("LC" + str(user.id))
                 payload = {
@@ -48,25 +55,27 @@ def BasketView(request):
                     "expirymonth": form.cleaned_data["expirymonth"],
                     "expiryyear": form.cleaned_data["expiryyear"],
                     "amount": basket.get_total_price(),
-                    "email": form.cleaned_data["email"],
-                    "phonenumber": form.cleaned_data["phone_number"],
+                    "email": user.email,
+                    "phonenumber": address.phone,
                     "txRef": txRef,
                     "enckey": encKey,
-                    "userid": str(user.id),
                 }
                 order_details = {
-                    "full_name": form.cleaned_data["firstname"]
-                    + " "
-                    + form.cleaned_data["lastname"],
-                    "address1": form.cleaned_data["address1"],
-                    "address2": form.cleaned_data["address2"],
-                    "city": form.cleaned_data["city"],
-                    "phone": form.cleaned_data["phone_number"],
-                    "post_code": form.cleaned_data["zipcode"],
+                    "full_name": address.full_name,
+                    "address1": address.address_line,
+                    "address2": address.address_line2,
+                    "city": address.town_city,
+                    "phone": address.phone,
+                    "post_code": address.postcode,
                     "order_key": txRef,
                     "userid": str(user.id),
                     "cardno": str(form.cleaned_data["cardno"])[-4:],
                     "amount": basket.get_total_price(),
+                    "email": user.email,
+                    "option": "Card",
+                    "delivery": DeliveryOptions.objects.get(
+                        id=session["purchase"]["delivery_id"]
+                    ).delivery_name,
                 }
                 order_items = []
                 for item in product_list2(request)["product_list2"]:
@@ -116,18 +125,15 @@ def BasketView(request):
                     billing_status=True
                 )
                 del request.session["payload"]
-                for item in product_list2(request)["product_list2"]:
-                    product = item[0]
-                    product.quantity = product.quantity - item[1]
-                    product.save()
-                basket.clear()
-                return render(request, "payment/orderplaced.html")
+                return orderplaced(request)
             else:
                 del request.session["payload"]
-                return render(
+                messages.success(
                     request,
-                    "payment/payment_form.html",
-                    {"form": form, "errMsg": True},
+                    "There was a problem with your card. Check your details and try again",
+                )
+                return HttpResponseRedirect(
+                    reverse("checkout:payment_selection")
                 )
 
         except (
@@ -136,19 +142,18 @@ def BasketView(request):
             RaveExceptions.TransactionValidationError,
         ) as e:
             del request.session["payload"]
-            form = PaymentForm()
-            return render(
+            messages.success(
                 request,
-                "payment/payment_form.html",
-                {"form": form, "errMsg": True},
+                "There was a problem with your card. Check your details and try again",
             )
+            return HttpResponseRedirect(reverse("checkout:payment_selection"))
 
 
-# def orderplaced(request):
-#    basket = Basket(request)
-#    for item in product_list2(request)['product_list2']:
-#        product = item[0]
-#        product.count = product.count - item[1]
-#        product.save()
-#    basket.clear()
-#    return render(request, 'payment/orderplaced.html')
+def orderplaced(request):
+    for item in product_list2(request)["product_list2"]:
+        product = item[0]
+        product.quantity = product.quantity - item[1]
+        product.save()
+    basket = Basket(request)
+    basket.clear()
+    return render(request, "payment/orderplaced.html")

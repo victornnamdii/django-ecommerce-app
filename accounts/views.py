@@ -20,6 +20,7 @@ from store.models import Product
 from .forms import RegistrationForm, UserAddressForm, UserEditForm
 from .models import Address, Customer
 from .tokens import account_activation_token
+from .decorators import cart_required, delivery_required
 
 # Create your views here.
 
@@ -95,8 +96,9 @@ def edit_details(request):
         user_form = UserEditForm(instance=request.user)
 
     return render(
-        request, "account/dashboard/edit_details.html",
-        {"user_form": user_form}
+        request,
+        "account/dashboard/edit_details.html",
+        {"user_form": user_form},
     )
 
 
@@ -183,7 +185,53 @@ def set_default(request, id):
         default=False
     )
     Address.objects.filter(pk=id, customer=request.user).update(default=True)
-    return redirect("account:addresses")
+    return redirect(request.META.get("HTTP_REFERER"))
+
+
+@delivery_required
+@cart_required
+@login_required
+def add_address_checkout(request):
+    """
+    Add Address
+    """
+    if request.method == "POST":
+        address_form = UserAddressForm(data=request.POST)
+        if address_form.is_valid():
+            address_form = address_form.save(commit=False)
+            address_form.customer = request.user
+            address_form.save()
+            return HttpResponseRedirect(reverse("checkout:delivery_address"))
+    else:
+        address_form = UserAddressForm()
+        return render(
+            request,
+            "account/dashboard/edit_addresses.html",
+            {"form": address_form},
+        )
+
+
+@delivery_required
+@cart_required
+@login_required
+def edit_address_checkout(request, id):
+    """
+    Edit Addresses
+    """
+    if request.method == "POST":
+        address = Address.objects.get(pk=id, customer=request.user)
+        address_form = UserAddressForm(instance=address, data=request.POST)
+        if address_form.is_valid():
+            address_form.save()
+            return HttpResponseRedirect(reverse("checkout:delivery_address"))
+    else:
+        address = Address.objects.get(pk=id, customer=request.user)
+        address_form = UserAddressForm(instance=address)
+        return render(
+            request,
+            "account/dashboard/edit_addresses.html",
+            {"form": address_form},
+        )
 
 
 # Wish List
@@ -194,12 +242,14 @@ def add_to_wishlist(request, id):
     product = get_object_or_404(Product, id=id)
     if product.users_wishlist.filter(id=request.user.id).exists():
         product.users_wishlist.remove(request.user)
-        messages.success(request,
-                         "Removed " + product.title + " from your Wish List")
+        messages.success(
+            request, "Removed " + product.title + " from your Wish List"
+        )
     else:
         product.users_wishlist.add(request.user)
-        messages.success(request,
-                         "Added " + product.title + " to your Wish List")
+        messages.success(
+            request, "Added " + product.title + " to your Wish List"
+        )
     return HttpResponseRedirect(request.META["HTTP_REFERER"])
 
 

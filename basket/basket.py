@@ -1,5 +1,8 @@
+from decimal import Decimal
+
 from django.conf import settings
 
+from checkout.models import DeliveryOptions
 from store.models import Product
 
 
@@ -75,14 +78,36 @@ class Basket:
         """
         Return basket total price
         """
-        return sum(item["qty"] * item["price"] for item in self.basket.values()
-                   )
+        return sum(
+            item["qty"] * item["price"] for item in self.basket.values()
+        )
 
     def get_total_price(self):
         """
         Return basket total price
         """
-        return round(self.get_subtotal_price() + 11.50, 2)
+        shipping = Decimal(0.00)
+
+        subtotal = sum(
+            item["qty"] * Decimal(item["price"])
+            for item in self.basket.values()
+        )
+        if "purchase" in self.session:
+            shipping = DeliveryOptions.objects.get(
+                id=self.session["purchase"]["delivery_id"]
+            ).delivery_price
+
+        return float(round(subtotal + shipping, 2))
+
+    def get_delivery_price(self):
+        shipping = 0.00
+
+        if "purchase" in self.session:
+            shipping = DeliveryOptions.objects.get(
+                id=self.session["purchase"]["delivery_id"]
+            ).delivery_price
+
+        return shipping
 
     def delete(self, product_id):
         """
@@ -98,5 +123,15 @@ class Basket:
         self.session.modified = True
 
     def clear(self):
+        del self.session["address"]
+        del self.session["purchase"]
         del self.session[settings.BASKET_SESSION_ID]
         self.save()
+
+    def basket_update_delivery(self, deliveryprice=0):
+        subtotal = sum(
+            item["qty"] * Decimal(item["price"])
+            for item in self.basket.values()
+        )
+        total = subtotal + deliveryprice
+        return round(total, 2)

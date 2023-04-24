@@ -1,22 +1,57 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Payment{% endblock %}
-{% block stylesheet %}{% static 'payment/css/verification/otp.css' %}{% endblock stylesheet %}
+{% block title %}Payment Selection{%endblock %}
+{% block stylesheet %}{% static 'payment/css/verification/pin.css' %}{% endblock stylesheet %}
 {% block content %}
 
-<h1>Enter OTP</h1>
-<div class="pin-code">
-	<form action="." method="post">
-		{% csrf_token %}
-	  <input type="number" name="first" maxlength="1" autofocus>
-    <input type="number" name="second" maxlength="1">
-	  <input type="number" name="third" maxlength="1">
-    <input type="number" name="fourth" maxlength="1">
-	<input type="number" name="fifth" maxlength="1">
-	<input type="hidden" name="step" value="otpcheck">
-	<input type="submit" value="Continue" class="nbtn">
-	</form>
- </div>
+<div class="container">
+    <div class="col-12">
+      <h3 class="h2">Enter OTP</h3>
+    </div>
+    <div class="col-12">
+      <p>Verifying payment</p>
+    </div>
+    <hr />
+</div>
+
+<div class="container">
+    <div class="row g-3">
+      <div class="col-md-4 col-lg-4 order-md-last p-0 order-3">
+        <div class="d-flex bd-highlight ms-0">
+          <div class="p-2 flex-grow-1 bd-highlight">Sub Total:</div>
+          <div class="p-2 bd-highlight"><span class="fw-bold h5">£</span><span id="sub_total"
+              class="fw-bold h5">{{basket.get_subtotal_price}}</span></div>
+        </div>
+        <div class="d-flex bd-highlight">
+          <div class="p-2 flex-grow-1 bd-highlight">Delivery Cost:</div>
+          <div class="p-2 bd-highlight"><span class="fw-bold h5">£</span><span id="delivery_price"
+              class="fw-bold h5">{{basket.get_delivery_price}}</span></div>
+        </div>
+        <div class="d-flex bd-highlight">
+          <div class="p-2 flex-grow-1 bd-highlight">Total:</div>
+          <div class="p-2 bd-highlight"><span class="fw-bold h5">£</span><span id="total"
+              class="fw-bold h5">{{basket.get_total_price}}</span></div>
+        </div>
+      </div>
+      <div class="col-md-7 col-lg-8 pe-0 pe-md-5">
+        <div class="pin-code">
+          <form action="{% url 'payment:basket' %}" method="post">
+            {% csrf_token %}
+            <input type="number" name="first" maxlength="1" autofocus>
+            <input type="number" name="second" maxlength="1">
+            <input type="number" name="third" maxlength="1">
+            <input type="number" name="fourth" maxlength="1">
+            <input type="number" name="fifth" maxlength="1">
+            <input type="hidden" name="step" value="otpcheck">
+          </div>
+          <div class="py-4">
+          <input type="submit" value="Continue" class="btn btn-success fw-bold w-100">
+          </div>
+          </form>
+
+      </div>
+    </div>
+</div>
 
 <script>
 	var pinContainer = document.querySelector(".pin-code");
@@ -55,4 +90,5 @@
 		target.value = "";
 	}, false);
 </script>
+
 {% endblock %}

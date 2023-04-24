@@ -24,8 +24,21 @@ def delivery_required(function):
         if "purchase" in request.session:
             return function(request, *args, **kwargs)
         else:
-            messages.success(request, "Please select delivery address")
+            messages.success(request, "Please select delivery method")
             return HttpResponseRedirect(reverse("checkout:deliverychoices"))
+
+    wrap.__doc__ = function.__doc__
+    wrap.__name__ = function.__name__
+    return wrap
+
+
+def address_required(function):
+    def wrap(request, *args, **kwargs):
+        if "address" in request.session:
+            return function(request, *args, **kwargs)
+        else:
+            messages.success(request, "Please select delivery address")
+            return HttpResponseRedirect(reverse("checkout:delivery_address"))
 
     wrap.__doc__ = function.__doc__
     wrap.__name__ = function.__name__

@@ -3,7 +3,6 @@
 {% block content %}
 
 
-<main class="pt-5">
   <div class="container" id="everyevery">
     {% if basket|length > 0 %}
     <div class="col-12">
@@ -44,7 +43,7 @@
       </div>
       <div class="col-md-5 col-lg-4 order-md-last p-0 order-3">
         <div class="d-grid gap-2 ">
-          <a role="button" href="{% url "payment:basket" %}" class="btn btn-success fw-bold" type="button">Checkout</a>
+          <a role="button" href="{% url "checkout:deliverychoices" %}" class="btn btn-success fw-bold" type="button">Checkout</a>
           <button class="btn btn-light" type="button">Save for later</button>
         </div>
       </div>
@@ -89,7 +88,6 @@
     <h1 class="h2">Your Basket is Empty :( <div class="row g-3"><div class="col-12"><a href="{% url 'store:store_home' %}">Shop</a></div></div></h1>
     {% endif %}
   </div>
-</main>
   
   <script>
     $(document).on('click', '#delete-button', function (event) {
