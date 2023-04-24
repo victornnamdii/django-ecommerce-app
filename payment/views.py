@@ -2,6 +2,7 @@ from os import getenv
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.shortcuts import HttpResponseRedirect, redirect, render
 from django.urls import reverse
 from rave_python import Misc, Rave, RaveExceptions
@@ -150,10 +151,11 @@ def BasketView(request):
 
 
 def orderplaced(request):
-    for item in product_list2(request)["product_list2"]:
-        product = item[0]
-        product.quantity = product.quantity - item[1]
-        product.save()
+    with transaction.atomic():
+        for item in product_list2(request)["product_list2"]:
+            product = item[0]
+            product.quantity = product.quantity - item[1]
+            product.save()
     basket = Basket(request)
     basket.clear()
     return render(request, "payment/orderplaced.html")

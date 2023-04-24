@@ -40,7 +40,7 @@ class OrderAdmin(admin.ModelAdmin):
         "payment_option",
         "delivery_method"
     ]
-    list_filter = ["billing_status", "updated"]
+    list_filter = ["billing_status", "updated", "order_shipped"]
     inlines = [OrderItemInline]
 
     def has_add_permission(self, request, obj=None):

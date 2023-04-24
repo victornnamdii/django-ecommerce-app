@@ -1,5 +1,6 @@
-from django.db import models
 from django.conf import settings
+from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from store.models import Product
 
@@ -7,9 +8,11 @@ from store.models import Product
 
 
 class Order(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE,
-                             related_name='order_user')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="order_user",
+    )
     full_name = models.CharField(max_length=50)
     email = models.EmailField(blank=True, max_length=254)
     address1 = models.CharField(max_length=250)
@@ -26,19 +29,24 @@ class Order(models.Model):
     cardno = models.CharField(max_length=4)
     payment_option = models.CharField(max_length=200, blank=True)
     delivery_method = models.CharField(max_length=100)
+    order_shipped = models.BooleanField(
+        _("Order processed/shipped?"), default=False
+    )
 
     class Meta:
-        ordering = ('-created',)
+        ordering = ("-created",)
 
     def __str__(self):
         return str(self.created)
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE,
-                              related_name='items')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE,
-                                related_name='order_items')
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name="items"
+    )
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name="order_items"
+    )
     price = models.DecimalField(max_digits=12, decimal_places=2)
     quantity = models.PositiveIntegerField(default=1)
 
