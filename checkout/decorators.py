@@ -43,3 +43,17 @@ def address_required(function):
     wrap.__doc__ = function.__doc__
     wrap.__name__ = function.__name__
     return wrap
+
+
+def billing_required(function):
+    def wrap(request, *args, **kwargs):
+        address = request.session.get("address")
+        if address and "billing" in address:
+            return function(request, *args, **kwargs)
+        else:
+            messages.success(request, "Please select billing address")
+            return HttpResponseRedirect(reverse("checkout:billing_address"))
+
+    wrap.__doc__ = function.__doc__
+    wrap.__name__ = function.__name__
+    return wrap

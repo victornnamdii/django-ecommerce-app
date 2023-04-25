@@ -82,7 +82,9 @@ class Address(models.Model):
     postcode = models.CharField(_("Postcode"), max_length=50)
     address_line = models.CharField(_("Address line 1"), max_length=255)
     address_line2 = models.CharField(_("Address line 2"), max_length=255)
-    town_city = models.CharField(_("Town/City/State"), max_length=150)
+    city = models.CharField(_("City"), max_length=150)
+    state = models.CharField(_("State"), max_length=150)
+    country = CountryField(blank_label="(select country)")
     delivery_instructions = models.CharField(
         _("Delivery Instructions"), max_length=255
     )

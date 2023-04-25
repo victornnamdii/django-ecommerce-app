@@ -29,7 +29,9 @@ def order_add(order_details, order_items):
             cardno=order_details["cardno"],
             email=order_details["email"],
             payment_option=order_details["option"],
-            delivery_method=order_details["delivery"]
+            delivery_method=order_details["delivery"],
+            country_code=order_details["country"],
+            state=order_details["state"],
         )
         order_id = order.pk
         for item in order_items:

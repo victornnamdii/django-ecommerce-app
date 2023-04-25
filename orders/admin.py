@@ -26,19 +26,20 @@ class OrderAdmin(admin.ModelAdmin):
     readonly_fields = [
         "user",
         "full_name",
+        "email",
         "address1",
         "address2",
         "city",
-        "phone",
+        "state",
         "postal_code",
+        "country_code",
+        "phone",
         "total_paid",
         "order_key",
         "billing_status",
         "cardno",
-        "email",
-        "country_code",
         "payment_option",
-        "delivery_method"
+        "delivery_method",
     ]
     list_filter = ["billing_status", "updated", "order_shipped"]
     inlines = [OrderItemInline]

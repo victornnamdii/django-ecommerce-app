@@ -1,16 +1,23 @@
 import json
+from os import getenv
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render
+from django_countries import countries
 from paypalcheckoutsdk.orders import OrdersGetRequest
 
-from accounts.models import Address
+from accounts.models import Address, Customer
 from basket.basket import Basket
 from orders.models import Order, OrderItem
 from payment.forms import PaymentForm
 
-from .decorators import address_required, cart_required, delivery_required
+from .decorators import (
+    address_required,
+    billing_required,
+    cart_required,
+    delivery_required,
+)
 from .models import DeliveryOptions
 from .paypal import PayPalClient
 
@@ -80,12 +87,49 @@ def delivery_address(request):
 @delivery_required
 @cart_required
 @login_required
+def billing_address(request):
+    """ """
+    session = request.session
+    addresses = Address.objects.filter(customer=request.user).order_by(
+        "-default"
+    )
+
+    if "address" not in request.session:
+        session["address"] = {"billing": str(addresses[0].id)}
+    else:
+        session["address"]["billing"] = str(addresses[0].id)
+        session.modified = True
+    return render(
+        request, "checkout/billing_address.html", {"addresses": addresses}
+    )
+
+
+@billing_required
+@address_required
+@delivery_required
+@cart_required
+@login_required
 def payment_selection(request):
     """"""
+    session = request.session
+    client_id = getenv("CLIENT_ID")
+    user = Customer.objects.get(name=request.user)
+    address = Address.objects.get(
+        pk=session["address"]["address_id"], customer=user.id
+    )
     form = PaymentForm()
-    return render(request, "checkout/payment_selection.html", {"form": form})
+    return render(
+        request,
+        "checkout/payment_selection.html",
+        {
+            "form": form,
+            "client_id": client_id,
+            "address": address,
+        },
+    )
 
 
+@billing_required
 @address_required
 @delivery_required
 @cart_required
@@ -114,20 +158,23 @@ def payment_complete(request):
         ].shipping.address.address_line_1,
         address2=response.result.purchase_units[
             0
-        ].shipping.address.admin_area_2,
+        ].shipping.address.address_line_2,
         postal_code=response.result.purchase_units[
             0
         ].shipping.address.postal_code,
-        country_code=response.result.purchase_units[
-            0
-        ].shipping.address.country_code,
+        country_code=dict(countries)[
+            response.result.purchase_units[0].shipping.address.country_code
+        ],
         total_paid=response.result.purchase_units[0].amount.value,
-        order_key="LC" + response.result.id,
-        payment_option="paypal",
+        order_key="LC" + user_id + "-" + response.result.id,
+        payment_option="Paypal",
         billing_status=True,
         delivery_method=DeliveryOptions.objects.get(
             id=session["purchase"]["delivery_id"]
         ).delivery_name,
+        state=response.result.purchase_units[0].shipping.address.admin_area_1,
+        city=response.result.purchase_units[0].shipping.address.admin_area_2,
+        phone=Address.objects.get(pk=session["address"]["address_id"]).phone,
     )
     order_id = order.pk
 

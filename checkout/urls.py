@@ -12,6 +12,7 @@ urlpatterns = [
         name="basket_update_delivery",
     ),
     path("delivery_address/", views.delivery_address, name="delivery_address"),
+    path("billing_address/", views.billing_address, name="billing_address"),
     path(
         "payment_selection/", views.payment_selection, name="payment_selection"
     ),

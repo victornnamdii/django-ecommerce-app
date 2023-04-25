@@ -15,7 +15,12 @@ from checkout.models import DeliveryOptions
 from orders.models import Order
 from orders.views import order_add
 
-from .decorators import cart_required, delivery_required
+from .decorators import (
+    address_required,
+    billing_required,
+    cart_required,
+    delivery_required,
+)
 from .forms import PaymentForm
 
 # Create your views here.
@@ -31,6 +36,8 @@ else:
     )
 
 
+@billing_required
+@address_required
 @delivery_required
 @cart_required
 @login_required
@@ -51,7 +58,7 @@ def BasketView(request):
                 payload = {
                     "cardno": form.cleaned_data["cardno"],
                     "cvv": form.cleaned_data["cvv"],
-                    "currency": "NGN",
+                    "currency": "GBP",
                     "country": "NG",
                     "expirymonth": form.cleaned_data["expirymonth"],
                     "expiryyear": form.cleaned_data["expiryyear"],
@@ -65,7 +72,7 @@ def BasketView(request):
                     "full_name": address.full_name,
                     "address1": address.address_line,
                     "address2": address.address_line2,
-                    "city": address.town_city,
+                    "city": address.city,
                     "phone": address.phone,
                     "post_code": address.postcode,
                     "order_key": txRef,
@@ -77,6 +84,8 @@ def BasketView(request):
                     "delivery": DeliveryOptions.objects.get(
                         id=session["purchase"]["delivery_id"]
                     ).delivery_name,
+                    "state": address.state,
+                    "country": address.country.name,
                 }
                 order_items = []
                 for item in product_list2(request)["product_list2"]:
@@ -106,8 +115,26 @@ def BasketView(request):
                         Misc.updatePayload(
                             res["suggestedAuth"], payload, pin=pin
                         )
-                        res = rave.Card.charge(payload)
-                        request.session["payload"] = payload
+
+                elif arg == "address":
+                    billing_address = Address.objects.get(
+                        customer=user.id, pk=session["address"]["billing"]
+                    )
+                    billing = {
+                        "billingzip": billing_address.postcode,
+                        "billingcity": billing_address.city,
+                        "billingaddress": billing_address.address_line
+                        + " "
+                        + billing_address.address_line2,
+                        "billingstate": billing_address.state,
+                        "billingcountry": billing_address.country.code,
+                    }
+                    Misc.updatePayload(
+                        res["suggestedAuth"], payload, address=billing
+                    )
+
+                res = rave.Card.charge(payload)
+                request.session["payload"] = payload
 
             if res["validationRequired"]:
                 if request.POST.get("step") != "otpcheck":

@@ -16,8 +16,10 @@ class UserAddressForm(forms.ModelForm):
             "phone",
             "address_line",
             "address_line2",
-            "town_city",
+            "city",
+            "state",
             "postcode",
+            "country",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -46,7 +48,7 @@ class UserAddressForm(forms.ModelForm):
                 "placeholder": "Address Line 2",
             }
         )
-        self.fields["town_city"].widget.attrs.update(
+        self.fields["city"].widget.attrs.update(
             {
                 "class": "form-control mb-2 account-form",
                 "placeholder": "Town/City/State",
@@ -56,6 +58,18 @@ class UserAddressForm(forms.ModelForm):
             {
                 "class": "form-control mb-2 account-form",
                 "placeholder": "Postcode",
+            }
+        )
+        self.fields["country"].widget.attrs.update(
+            {
+                "class": "form-control mb-2 account-form",
+                "placeholder": "Country",
+            }
+        )
+        self.fields["state"].widget.attrs.update(
+            {
+                "class": "form-control mb-2 account-form",
+                "placeholder": "Country",
             }
         )
 

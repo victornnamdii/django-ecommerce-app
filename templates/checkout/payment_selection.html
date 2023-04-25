@@ -89,7 +89,7 @@
 </div>
 
 <script data-sdk-integration-source="integrationbuilder_ac"></script>
-<script src="https://www.paypal.com/sdk/js?currency=GBP&client-id=AbjGyuAvsQIugwS7LYxHIs5xpbmZkiNvqIdyqU3WJrp9y0g3tte-G_NpkScFMKDuQAA8yFF2WLQPbFeg" data-sdk-integration-source="button-factory"></script>
+<script src="https://www.paypal.com/sdk/js?currency=GBP&client-id={{client_id}}" data-sdk-integration-source="button-factory"></script>
 
 <script>
     function getCookie(name) {
@@ -125,7 +125,20 @@
                     purchase_units: [{
                         "amount": {
                             "value": '{{basket.get_total_price}}'
-                        }
+                        },
+                        "shipping": {
+                          "address": {
+                            "address_line_1": '{{address.address_line}}',
+                            "address_line_2": '{{address.address_line2}}',
+                            "admin_area_2": '{{address.city}}',
+                            "admin_area_1": '{{address.state}}',
+                            "postal_code": '{{address.postcode}}',
+                            "country_code": '{{address.country.code}}'
+                          },
+                          "name": {
+                            "full_name": '{{address.full_name}}',
+                          }
+                        },
                     }]
                 });
             },

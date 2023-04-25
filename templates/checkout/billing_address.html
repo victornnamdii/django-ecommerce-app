@@ -5,10 +5,10 @@
 
 <div class="container">
   <div class="col-12">
-    <h1 class="h2">Delivery Address</h1>
+    <h1 class="h2">Billing Address</h1>
   </div>
   <div class="col-12">
-    <p>Please select your delivery address</p>
+    <p>Please select your billing address</p>
   </div>
   <hr />
 </div>
@@ -17,7 +17,7 @@
 <div class="container">
   <div class="row g-3">
     {% if addresses|length == 0 %}
-    <div class="col-12">There are no delivery addresses, <a href="{% url 'account:add_address' %}">add address</a></div>
+    <div class="col-12">There are no billing addresses, <a href="{% url 'account:add_address' %}">add address</a></div>
     {% else %}
     <div class="col-md-4 col-lg-4 order-md-last p-0 order-3">
     
@@ -33,7 +33,7 @@
   <div class="p-2 flex-grow-1 bd-highlight">Total:</div>
   <div class="p-2 bd-highlight"><span class="fw-bold h5">£</span><span id="total"class="fw-bold h5">{{basket.get_total_price}}</span></div>
 </div>
-<a role="button" href="{% url 'checkout:billing_address' %}" class="btn btn-success fw-bold w-100" type="button">Continue</a>
+<a role="button" href="{% url 'checkout:payment_selection' %}" class="btn btn-success fw-bold w-100" type="button">Pay Securely</a>
 </div>
     
     <div class="col-md-7 col-lg-8">
@@ -53,6 +53,7 @@
                 <p class="card-text m-0">{{address.address_line}}</p>
                 <p class="card-text m-0">{{address.address_line2}}</p>
                 <p class="card-text m-0">{{address.city}}</p>
+                <p class="card-text m-0">{{address.state}}</p>
                 <p class="card-text m-0">{{address.postcode}}</p>
                 <p class="card-text m-0">{{address.country}}</p>
                 <p class="card-text m-0">Phone number: {{address.phone}}</p>
