@@ -24,15 +24,23 @@ The application enables merchants to sell their products, manage the store, rece
 
 * Clone this repository: `git clone "https://github.com/victornnamdii/django-ecommerce-app.git"`
 * Access the directory: `cd django-ecommerce-app`
+* Create virtual environment (optional):
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+* Install application requirements: `pip install -r requirements.txt`
 
 ## Starting the Application
 
 **With both Paypal and Flutterwave keys available:**
 Open the file `runstore` and insert your keys in the appropriate places and run the command:
-```./runstore```
+```./runstore``` and open `127.0.0.1:8000` in your browser.
 
 **Without Paypal or Flutterwave keys available (payments would not work):**
-```./runstore```
+Run the command: ```./runstore```
 and open `127.0.0.1:8000` in your browser.
 ![alt text](https://github.com/victornnamdii/django-ecommerce-app/blob/main/_images/image3.png?raw=true)
 ![alt text](https://github.com/victornnamdii/django-ecommerce-app/blob/main/_images/image18.png?raw=true)
