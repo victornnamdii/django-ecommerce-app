@@ -40,9 +40,8 @@ and open `127.0.0.1:8000` in your browser.
 ![alt text](https://github.com/victornnamdii/django-ecommerce-app/blob/main/_images/image20.png?raw=true)
 ![alt text](https://github.com/victornnamdii/django-ecommerce-app/blob/main/_images/image21.png?raw=true)
 ![alt text](https://github.com/victornnamdii/django-ecommerce-app/blob/main/_images/image17.png?raw=true)
-> Screenshots taken on Google Chrome
-/
-> If running in production, please open `core/settings/base.py` and change DEBUG to False
+> Screenshots taken on Google Chrome.
+If running in production, please open `core/settings/base.py` and change DEBUG to False
 
 ## Create Admin User
 
@@ -71,7 +70,7 @@ Here, you can add new delivery methods to the store with their prices and delive
 ![alt text](https://github.com/victornnamdii/django-ecommerce-app/blob/main/_images/image6.png?raw=true)
 ![alt text](https://github.com/victornnamdii/django-ecommerce-app/blob/main/_images/image7.png?raw=true)
 > Admin Side
-/
+
 ![alt text](https://github.com/victornnamdii/django-ecommerce-app/blob/main/_images/image15.png?raw=true)
 > Customer side
 > Screenshots taken on Google Chrome
