@@ -6,24 +6,24 @@ The application enables merchants to sell their products, manage the store, rece
 
 ## Features of the application
 
-    *A store for buying and selling products.
-    *An admin area for managing and updating the store and orders received from customers.
-        *Add new products too the store.
-        *Delete products from the store
-        *Update product information.
-        *Create different categories for products on the store.
-        *Enable and disable user accounts.
-        *View orders created by customers
-    *A CRUD app for customer addresses available to customers.
-    *Customer's wishlist section available to customers.
-    *Paypal integration for payments through paypal.
-    *Flutterwave integration for card payments.
-    *Can be used without need for extra code.
+    * A store for buying and selling products.
+    * An admin area for managing and updating the store and orders received from customers.
+        * Add new products too the store.
+        * Delete products from the store
+        * Update product information.
+        * Create different categories for products on the store.
+        * Enable and disable user accounts.
+        * View orders created by customers
+    * A CRUD app for customer addresses available to customers.
+    * Customer's wishlist section available to customers.
+    * Paypal integration for payments through paypal.
+    * Flutterwave integration for card payments.
+    * Can be used without need for extra code.
 
 ## Installation
 
-    *Clone this repository: `git clone "https://github.com/victornnamdii/django-ecommerce-app.git"`
-    *Access the directory: `cd django-ecommerce-app`
+    * Clone this repository: `git clone "https://github.com/victornnamdii/django-ecommerce-app.git"`
+    * Access the directory: `cd django-ecommerce-app`
 
 ## Starting the Application
 
