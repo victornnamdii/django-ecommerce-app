@@ -28,7 +28,7 @@ publicKey = getenv("RAVE_PUBLIC_KEY")
 secretKey = getenv("RAVE_SECRET_KEY")
 encKey = getenv("RAVE_ENC_KEY")
 
-if secretKey:
+if secretKey and secretKey != 'YOUR_RAVE_SECRET_KEY':
     rave = Rave(publicKey, secretKey)
 else:
     rave = Rave(
