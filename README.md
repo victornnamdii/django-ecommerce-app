@@ -27,7 +27,7 @@ The application enables merchants to sell their products, manage the store, rece
 * Create virtual environment (optional):
 
 ```bash
-python3 -m venv venv
+python -m venv venv
 source venv/bin/activate
 ```
 
@@ -37,11 +37,22 @@ source venv/bin/activate
 
 **With both Paypal and Flutterwave keys available:**
 Open the file `runstore` and insert your keys in the appropriate places and run the command:
-```./runstore``` and open `127.0.0.1:8000` in your browser.
+
+```bash
+./runstore
+```
+
+and open `127.0.0.1:8000` in your browser.
 
 **Without Paypal or Flutterwave keys available (payments would not work):**
-Run the command: ```./runstore```
+Run the command:
+
+```bash
+./runstore
+```
+
 and open `127.0.0.1:8000` in your browser.
+
 ![alt text](https://github.com/victornnamdii/django-ecommerce-app/blob/main/_images/image3.png?raw=true)
 ![alt text](https://github.com/victornnamdii/django-ecommerce-app/blob/main/_images/image18.png?raw=true)
 ![alt text](https://github.com/victornnamdii/django-ecommerce-app/blob/main/_images/image19.png?raw=true)
@@ -55,12 +66,17 @@ If running in production, please open `core/settings/base.py` and change DEBUG t
 ## Create Admin User
 
 To create an admin user with permissions to manage the store, run the command:
-```python manage.py createsuperuser```
+
+```bash
+python manage.py createsuperuser
+```
+
 and follow the instructions.
 
 ## Using the Admin area
 
 Open `127.0.0.1:8000/admin` in your browser and log in with your details to enter the admin area.
+
 ![alt text](https://github.com/victornnamdii/django-ecommerce-app/blob/main/_images/image.png?raw=true)
 > Screenshots taken on Google Chrome
 
@@ -86,7 +102,7 @@ Here, you can add new delivery methods to the store with their prices and delive
 ### Orders
 
 ![alt text](https://github.com/victornnamdii/django-ecommerce-app/blob/main/_images/image2.png?raw=true)
-> Admin side
+> Admin side (screenshots taken on Google Chrome)
 
 ![alt text](https://github.com/victornnamdii/django-ecommerce-app/blob/main/_images/image16.png?raw=true)
 > Customer side (screenshots taken on Google Chrome)
