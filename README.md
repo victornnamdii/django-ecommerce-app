@@ -41,6 +41,7 @@ and open `127.0.0.1:8000` in your browser.
 ![alt text](https://github.com/victornnamdii/django-ecommerce-app/blob/main/_images/image21.png?raw=true)
 ![alt text](https://github.com/victornnamdii/django-ecommerce-app/blob/main/_images/image17.png?raw=true)
 > Screenshots taken on Google Chrome.
+
 If running in production, please open `core/settings/base.py` and change DEBUG to False
 
 ## Create Admin User
@@ -69,19 +70,18 @@ Here, you can add new delivery methods to the store with their prices and delive
 
 ![alt text](https://github.com/victornnamdii/django-ecommerce-app/blob/main/_images/image6.png?raw=true)
 ![alt text](https://github.com/victornnamdii/django-ecommerce-app/blob/main/_images/image7.png?raw=true)
-> Admin Side
+> Admin Side (screenshots taken on Google Chrome)
 
 ![alt text](https://github.com/victornnamdii/django-ecommerce-app/blob/main/_images/image15.png?raw=true)
-> Customer side
-> Screenshots taken on Google Chrome
+> Customer side (screenshots taken on Google Chrome)
 
 ### Orders
 
 ![alt text](https://github.com/victornnamdii/django-ecommerce-app/blob/main/_images/image2.png?raw=true)
 > Admin side
+
 ![alt text](https://github.com/victornnamdii/django-ecommerce-app/blob/main/_images/image16.png?raw=true)
-> Customer side
-> Screenshots taken on Google Chrome
+> Customer side (screenshots taken on Google Chrome)
 
 Here, the admin user can see orders that have been made by customers and can also filter the results depending on the date created, if it has been shipped and also their billing status.
 Clicking on any of the orders give you full information about them.
