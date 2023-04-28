@@ -166,7 +166,7 @@ def payment_complete(request):
             response.result.purchase_units[0].shipping.address.country_code
         ],
         total_paid=response.result.purchase_units[0].amount.value,
-        order_key="LC" + user_id + "-" + response.result.id,
+        order_key="LC" + str(user_id) + "-" + response.result.id,
         payment_option="Paypal",
         billing_status=True,
         delivery_method=DeliveryOptions.objects.get(
